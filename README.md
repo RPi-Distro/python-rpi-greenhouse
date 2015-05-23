@@ -1,4 +1,4 @@
-# Garden project test scripts
+# Garden Kit
 
 ## Components
 
