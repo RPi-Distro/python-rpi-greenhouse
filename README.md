@@ -23,7 +23,7 @@
 
 ## Requirements
 
-- DHT22 requires Adafruit DHT Python library (currently Python 2 only):
+- DHT22 requires Adafruit DHT Python library which is not in PyPi and currently Python 2 only:
 
 ```bash
 sudo apt-get install build-essential python-dev
