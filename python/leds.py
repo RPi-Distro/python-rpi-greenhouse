@@ -22,10 +22,10 @@ def control_leds(leds=None, on_or_off=True, pause=0, backwards=False):
         sleep(pause)
 
 
-RED_LEDS = [16, 20, 21, 26]
-WHITE_LEDS = [6, 12, 13, 19]
-GREEN_LEDS = [9, 11, 25, 8]
-YELLOW_LEDS = [27, 22, 23, 24]
+RED_LEDS = [16, 11, 23]
+WHITE_LEDS = [13, 9, 27]
+GREEN_LEDS = [21, 12, 25]
+BLUE_LEDS = [20, 6, 22]
 
 LEDS = RED_LEDS + WHITE_LEDS + GREEN_LEDS + YELLOW_LEDS
 
