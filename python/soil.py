@@ -16,10 +16,11 @@ def get_soil_moisture(pin):
     return end_time - start_time
 
 def main():
-    soil = 14
+    soil = 26
 
     while True:
-        print(get_soil_moisture(soil))
+        sleep(0.1)
+        print("%f" % get_soil_moisture(soil))
 
 
 if __name__ == '__main__':
