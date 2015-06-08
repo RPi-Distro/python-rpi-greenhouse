@@ -1,10 +1,8 @@
 from RPi import GPIO
 from time import sleep
 
-
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
-
 
 def setup_leds():
     for led in LEDS:
@@ -21,7 +19,6 @@ def control_leds(leds=None, on_or_off=True, pause=0, backwards=False):
         GPIO.output(led, on_or_off)
         sleep(pause)
 
-
 RED_LEDS = [16, 11, 23]
 WHITE_LEDS = [13, 9, 27]
 GREEN_LEDS = [21, 12, 25]
@@ -30,7 +27,6 @@ BLUE_LEDS = [20, 6, 22]
 LEDS = RED_LEDS + WHITE_LEDS + GREEN_LEDS + BLUE_LEDS
 
 setup_leds()
-
 
 def main():
     print("Turning LEDs on")

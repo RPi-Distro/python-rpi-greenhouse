@@ -4,6 +4,8 @@ from time import time, sleep
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
+PIN = 26
+
 def get_soil_moisture(pin):
     GPIO.setup(pin, GPIO.OUT)
     GPIO.output(pin, GPIO.LOW)
@@ -16,11 +18,9 @@ def get_soil_moisture(pin):
     return end_time - start_time
 
 def main():
-    soil = 26
-
     while True:
         sleep(0.1)
-        print("%f" % get_soil_moisture(soil))
+        print("%f" % get_soil_moisture(PIN))
 
 
 if __name__ == '__main__':

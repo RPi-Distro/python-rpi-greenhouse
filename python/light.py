@@ -1,9 +1,10 @@
 from RPi import GPIO
 from time import sleep
 
-
 GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
 
+PIN = 18
 
 def get_light_sensor_value(pin):
     GPIO.setup(pin, GPIO.OUT)
@@ -17,7 +18,7 @@ def get_light_sensor_value(pin):
 
 def main():
     while True:
-        print(get_light_sensor_value(18))
+        print(get_light_sensor_value(PIN))
 
 
 if __name__ == '__main__':
