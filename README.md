@@ -40,4 +40,5 @@ cd Adafruit_Python_DHT
 sudo python setup.py install
 cd ..
 sudo rm -rf Adafruit_Python_DHT
+git clone https://github.com/bennuttall/garden-kit
 ```
