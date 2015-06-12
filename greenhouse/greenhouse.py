@@ -12,6 +12,10 @@ class Greenhouse(object):
         'blue': [20, 6, 22],
     }
 
+    SENSOR_LOW = -1
+    SENSOR_OK = 0
+    SENSOR_HIGH = 1
+
     target_temperature_lower = 5
     target_temperature_upper = 30
 
@@ -42,21 +46,39 @@ class Greenhouse(object):
     def temperature_status(self):
         lower = self.target_temperature_lower
         upper = self.target_temperature_upper
-        return lower <= self.temperature <= upper
+
+        if lower <= self.temperature <= upper:
+            return self.SENSOR_OK
+        elif self.temperature < lower:
+            return self.SENSOR_LOW
+        elif self.temperature > higher:
+            return self.SENSOR_HIGH
 
     @property
     def humidity_status(self):
         lower = self.target_humidity_lower
         upper = self.target_humidity_upper
-        return lower <= self.humidity <= upper
+
+        if lower <= self.humidity <= upper:
+            return self.SENSOR_OK
+        elif self.humidity < lower:
+            return self.SENSOR_LOW
+        elif self.humidity > higher:
+            return self.SENSOR_HIGH
 
     @property
     def soil_status(self):
-        return self.soil >= self.target_soil
+        if self.soil >= self.target_soil:
+            return self.SENSOR_OK
+        else:
+            return self.SENSOR_LOW
 
     @property
     def light_status(self):
-        return self.light >= self.target_light
+        if self.light >= self.target_light:
+            return self.SENSOR_OK
+        else:
+            return self.SENSOR_LOW
 
     def __init__(self):
         self._setup_gpio()
@@ -132,19 +154,27 @@ class Greenhouse(object):
 
 def main():
     greenhouse = Greenhouse()
-    if greenhouse.temperature_status:
+
+    if greenhouse.temperature_status == greenhouse.SENSOR_OK:
         print("Temperature ok")
-    else:
-        print("Temperature not ok")
-    if greenhouse.humidity_status:
+    elif greenhouse.temperature_status == greenhouse.SENSOR_LOW:
+        print("Temperature too low")
+    elif greenhouse.temperature_status == greenhouse.SENSOR_HIGH:
+        print("Temperature too high")
+
+    if greenhouse.humidity_status == greenhouse.SENSOR_OK:
         print("Humidity ok")
-    else:
-        print("Humidity not ok")
-    if greenhouse.soil_status:
+    elif greenhouse.humidity_status == greenhouse.SENSOR_LOW:
+        print("Humidity too low")
+    elif greenhouse.humidity_status == greenhouse.SENSOR_HIGH:
+        print("Humidity too high")
+
+    if greenhouse.soil_status == greenhouse.SENSOR_OK:
         print("Soil ok")
     else:
-        print("Soil not ok")
-    if greenhouse.light_status:
+        print("Soil too dry")
+
+    if greenhouse.light_status == greenhouse.SENSOR_OK:
         print("Light ok")
     else:
         print("Light not ok")
