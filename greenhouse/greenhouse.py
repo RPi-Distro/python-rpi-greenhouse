@@ -1,8 +1,27 @@
 from RPi import GPIO
+import sqlite3 as sqlite
+from datetime import datetime
 from time import sleep
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
+
+db = sqlite.connect("greenhouse.db")
+cursor = db.cursor()
+
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS
+        greenhouse (
+            datetime TEXT,
+            temperature REAL,
+            humidity REAL,
+            soil REAL,
+            light REAL
+        )
+""")
+db.commit()
+
+
 
 class Greenhouse(object):
     LEDS = {
@@ -152,8 +171,33 @@ class Greenhouse(object):
         """
         self._turn_all_leds_on_or_off(on_or_off=False)
 
+    def record_sensor_values(self):
+        """
+        Save sensor readings to database
+        """
+        timestamp = datetime.now().isoformat()
+        temperature = self.temperature
+        humidity = self.humidity
+        soil = self.soil
+        light = self.light
+
+        values = (timestamp, temperature, humidity, soil, light)
+        cursor.execute("""
+            INSERT INTO greenhouse
+            VALUES (?, ?, ?, ?, ?)
+        """, values)
+        db.commit()
+
+    def show_database(self):
+        cursor.execute("SELECT * from greenhouse")
+        results = cursor.fetchall()
+        for result in results:
+            print(result)
+
 def main():
     greenhouse = Greenhouse()
+    greenhouse.record_sensor_values()
+    greenhouse.show_database()
 
     if greenhouse.temperature_status == greenhouse.SENSOR_OK:
         print("Temperature ok")
