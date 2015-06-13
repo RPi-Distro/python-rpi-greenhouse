@@ -188,16 +188,22 @@ class Greenhouse(object):
         """, values)
         db.commit()
 
-    def show_database(self):
+    def export_to_csv(self, file_path):
+        """
+        Export sensor data from database and save as CSV file in file_path
+        """
         cursor.execute("SELECT * from greenhouse")
         results = cursor.fetchall()
-        for result in results:
-            print(result)
+        with open(file_path, 'w') as f:
+            for result in results:
+                for data in result:
+                    f.write('%s,' % data)
+                f.write('\n')
 
 def main():
     greenhouse = Greenhouse()
     greenhouse.record_sensor_values()
-    greenhouse.show_database()
+    greenhouse.export_to_csv('/home/pi/test.csv')
 
     if greenhouse.temperature_status == greenhouse.SENSOR_OK:
         print("Temperature ok")
