@@ -22,7 +22,6 @@ cursor.execute("""
 db.commit()
 
 
-
 class Greenhouse(object):
     LEDS = {
         'red': [16, 11, 23],
@@ -199,6 +198,7 @@ class Greenhouse(object):
                 for data in result:
                     f.write('%s,' % data)
                 f.write('\n')
+
 
 def main():
     greenhouse = Greenhouse()
