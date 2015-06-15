@@ -2,17 +2,17 @@
 
 ## Components
 
-- Soil Moisture sesnsor - GPIO 14
+- Soil Moisture sesnsor - **GPIO 26**
     
     http://www.instructables.com/id/Soil-Moisture-Sensor-1/?ALLSTEPS
 
-- Temperature and Humidity sensor DHT22 - GPIO 4
+- Temperature and Humidity sensor DHT22 - **GPIO 19**
 
     https://learn.adafruit.com/dht-humidity-sensing-on-raspberry-pi-with-gdocs-logging/wiring
     
     Uses 10k resistor
 
-- Light sensor - GPIO 18
+- Light sensor - **GPIO 18**
 
     https://learn.adafruit.com/basic-resistor-sensor-reading-on-raspberry-pi/basic-photocell-reading
 
@@ -25,9 +25,13 @@
     BLUE: 20, 6, 22
     ```
 
-- RTC
+- RTC (DS1307)
 
-    http://thepihut.com/blogs/raspberry-pi-tutorials/17209332-adding-a-real-time-clock-to-your-raspberry-pi
+    - Enable `i2c` in `raspi-config`
+    - Add `dtoverlay=i2c-rtc,ds1307` to `/boot/config.txt`
+    - Check system date is correct, update if necessary
+    - Set RTC from system date with `sudo hwclock -w`
+    - Read RTC date with `sudo hwclock -r`
 
 ## Requirements
 
