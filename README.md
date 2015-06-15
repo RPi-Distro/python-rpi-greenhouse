@@ -25,9 +25,13 @@
     BLUE: 20, 6, 22
     ```
 
-- RTC
+- RTC (DS1307)
 
-    http://thepihut.com/blogs/raspberry-pi-tutorials/17209332-adding-a-real-time-clock-to-your-raspberry-pi
+    - Enable `i2c` in `raspi-config`
+    - Add `dtoverlay=i2c-rtc,ds1307` to `/boot/config.txt`
+    - Check system date is correct, update if necessary
+    - Set RTC from system date with `sudo hwclock -w`
+    - Read RTC date with `sudo hwclock -r`
 
 ## Requirements
 
