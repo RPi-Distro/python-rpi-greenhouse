@@ -1,7 +1,8 @@
 from RPi import GPIO
+import Adafruit_DHT
 import sqlite3 as sqlite
 from datetime import datetime
-from time import sleep
+from time import sleep, time
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -30,6 +31,11 @@ class Greenhouse(object):
         'blue': [20, 6, 22],
     }
 
+    DHT_SENSOR = Adafruit_DHT.DHT22
+    DHT = 19
+    SOIL = 26
+    LIGHT = 18
+
     SENSOR_LOW = -1
     SENSOR_OK = 0
     SENSOR_HIGH = 1
@@ -46,19 +52,36 @@ class Greenhouse(object):
 
     @property
     def temperature(self):
-        return 30.0
+        humidity, temperature = self._get_humidity_and_temperature()
+        return temperature
 
     @property
     def humidity(self):
-        return 0.4
+        humidity, temperature = self._get_humidity_and_temperature()
+        return humidity
 
     @property
     def soil(self):
-        return 0.6
+        GPIO.setup(self.SOIL, GPIO.OUT)
+        GPIO.output(self.SOIL, GPIO.LOW)
+        sleep(0.1)
+        GPIO.setup(self.SOIL, GPIO.IN)
+        start_time = time()
+        while GPIO.input(self.SOIL) == GPIO.LOW:
+            pass
+        end_time = time()
+        return end_time - start_time
 
     @property
     def light(self):
-        return 0.8
+        GPIO.setup(self.LIGHT, GPIO.OUT)
+        GPIO.output(self.LIGHT, GPIO.LOW)
+        sleep(0.1)
+        GPIO.setup(self.LIGHT, GPIO.IN)
+        reading = 0
+        while GPIO.input(self.LIGHT) == GPIO.LOW:
+                reading += 1
+        return reading
 
     @property
     def temperature_status(self):
@@ -81,7 +104,7 @@ class Greenhouse(object):
             return self.SENSOR_OK
         elif self.humidity < lower:
             return self.SENSOR_LOW
-        elif self.humidity > higher:
+        elif self.humidity > upper:
             return self.SENSOR_HIGH
 
     @property
@@ -125,6 +148,10 @@ class Greenhouse(object):
                 self.turn_colour_leds_on(colour)
             else:
                 self.turn_colour_leds_off(colour)
+
+    def _get_humidity_and_temperature(self):
+        humidity, temperature = Adafruit_DHT.read_retry(self.DHT_SENSOR, self.DHT)
+        return (humidity, temperature)
 
     def turn_led_on(self, colour, index):
         """
@@ -204,6 +231,11 @@ def main():
     greenhouse = Greenhouse()
     greenhouse.record_sensor_values()
     greenhouse.export_to_csv('/home/pi/test.csv')
+
+    print("Temperature: %f" % greenhouse.temperature)
+    print("Humidity: %f" % greenhouse.humidity)
+    print("Soil: %f" % greenhouse.soil)
+    print("Light: %f" % greenhouse.light)
 
     if greenhouse.temperature_status == greenhouse.SENSOR_OK:
         print("Temperature ok")
