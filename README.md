@@ -2,17 +2,17 @@
 
 ## Components
 
-- Soil Moisture sesnsor - GPIO 14
+- Soil Moisture sesnsor - **GPIO 26**
     
     http://www.instructables.com/id/Soil-Moisture-Sensor-1/?ALLSTEPS
 
-- Temperature and Humidity sensor DHT22 - GPIO 4
+- Temperature and Humidity sensor DHT22 - **GPIO 19**
 
     https://learn.adafruit.com/dht-humidity-sensing-on-raspberry-pi-with-gdocs-logging/wiring
     
     Uses 10k resistor
 
-- Light sensor - GPIO 18
+- Light sensor - **GPIO 18**
 
     https://learn.adafruit.com/basic-resistor-sensor-reading-on-raspberry-pi/basic-photocell-reading
 
