@@ -51,39 +51,6 @@ class Greenhouse(object):
     target_light = 0.6
 
     @property
-    def temperature(self):
-        humidity, temperature = self._get_humidity_and_temperature()
-        return temperature
-
-    @property
-    def humidity(self):
-        humidity, temperature = self._get_humidity_and_temperature()
-        return humidity
-
-    @property
-    def soil(self):
-        GPIO.setup(self.SOIL, GPIO.OUT)
-        GPIO.output(self.SOIL, GPIO.LOW)
-        sleep(0.1)
-        GPIO.setup(self.SOIL, GPIO.IN)
-        start_time = time()
-        while GPIO.input(self.SOIL) == GPIO.LOW:
-            pass
-        end_time = time()
-        return end_time - start_time
-
-    @property
-    def light(self):
-        GPIO.setup(self.LIGHT, GPIO.OUT)
-        GPIO.output(self.LIGHT, GPIO.LOW)
-        sleep(0.1)
-        GPIO.setup(self.LIGHT, GPIO.IN)
-        reading = 0
-        while GPIO.input(self.LIGHT) == GPIO.LOW:
-                reading += 1
-        return reading
-
-    @property
     def temperature_status(self):
         lower = self.target_temperature_lower
         upper = self.target_temperature_upper
@@ -123,12 +90,18 @@ class Greenhouse(object):
 
     def __init__(self):
         self._setup_gpio()
+        self._init_sensors()
 
     def _setup_gpio(self):
         for colour in self.LEDS:
             for led in self.LEDS[colour]:
                 GPIO.setup(led, GPIO.OUT)
                 GPIO.output(led, False)
+
+    def _init_sensors(self):
+        self._get_humidity_and_temperature()
+        self.get_soil()
+        self.get_light()
 
     def _turn_led_on_or_off(self, colour, index, on_or_off):
         led = self.LEDS[colour][index]
@@ -151,6 +124,8 @@ class Greenhouse(object):
 
     def _get_humidity_and_temperature(self):
         humidity, temperature = Adafruit_DHT.read_retry(self.DHT_SENSOR, self.DHT)
+        self.humidity = humidity
+        self.temperature = temperature
         return (humidity, temperature)
 
     def turn_led_on(self, colour, index):
@@ -196,6 +171,60 @@ class Greenhouse(object):
         Turn all LEDs off
         """
         self._turn_all_leds_on_or_off(on_or_off=False)
+
+    def get_temperature(self):
+        """
+        Return temperature value from sensor
+
+        (use greenhouse.temperature for cached value)
+        """
+        humidity, temperature = self._get_humidity_and_temperature()
+        self.temperature = temperature
+        return temperature
+
+    def get_humidity(self):
+        """
+        Return humidity value from sensor
+
+        (use greenhouse.humidity for cached value)
+        """
+        humidity, temperature = self._get_humidity_and_temperature()
+        self.humidity = humidity
+        return humidity
+
+    def get_soil(self):
+        """
+        Return soil moisture value from sensor
+
+        (use greenhouse.soil for cached value)
+        """
+        GPIO.setup(self.SOIL, GPIO.OUT)
+        GPIO.output(self.SOIL, GPIO.LOW)
+        sleep(0.1)
+        GPIO.setup(self.SOIL, GPIO.IN)
+        start_time = time()
+        while GPIO.input(self.SOIL) == GPIO.LOW:
+            pass
+        end_time = time()
+        soil_moisture = end_time - start_time
+        self.soil = soil_moisture
+        return soil_moisture
+
+    def get_light(self):
+        """
+        Return light value from sensor
+
+        (use greenhouse.light for cached value)
+        """
+        GPIO.setup(self.LIGHT, GPIO.OUT)
+        GPIO.output(self.LIGHT, GPIO.LOW)
+        sleep(0.1)
+        GPIO.setup(self.LIGHT, GPIO.IN)
+        light = 0
+        while GPIO.input(self.LIGHT) == GPIO.LOW:
+            light += 1
+        self.light = light
+        return light
 
     def record_sensor_values(self):
         """
