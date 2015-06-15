@@ -6,7 +6,7 @@ from time import sleep
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-db = sqlite.connect("greenhouse.db")
+db = sqlite.connect("/home/pi/db/greenhouse.db")
 cursor = db.cursor()
 
 cursor.execute("""
