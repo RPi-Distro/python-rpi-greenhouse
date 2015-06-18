@@ -1,3 +1,4 @@
+from __future__ import print_function
 from RPi import GPIO
 from time import time, sleep
 
@@ -19,8 +20,9 @@ def get_soil_moisture(pin):
 
 def main():
     while True:
-        sleep(0.1)
-        print("%f" % get_soil_moisture(PIN))
+        sleep(1)
+        soil_moisture = get_soil_moisture(PIN) * 1000
+        print("%f" % soil_moisture)
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 from RPi import GPIO
 import Adafruit_DHT
 import sqlite3 as sqlite
@@ -25,10 +26,10 @@ db.commit()
 
 class Greenhouse(object):
     LEDS = {
-        'red': [16, 11, 23],
         'white': [13, 9, 27],
-        'green': [21, 12, 25],
+        'red': [16, 11, 23],
         'blue': [20, 6, 22],
+        'green': [21, 12, 25],
     }
 
     DHT_SENSOR = Adafruit_DHT.DHT22
@@ -40,15 +41,13 @@ class Greenhouse(object):
     SENSOR_OK = 0
     SENSOR_HIGH = 1
 
-    target_temperature_lower = 5
+    target_temperature_lower = 20
     target_temperature_upper = 30
 
-    target_humidity_lower = 0.3
-    target_humidity_upper = 0.6
+    target_humidity_lower = 40
+    target_humidity_upper = 60
 
-    target_soil = 0.6
-
-    target_light = 0.6
+    target_light = 60
 
     @property
     def temperature_status(self):
@@ -76,7 +75,7 @@ class Greenhouse(object):
 
     @property
     def soil_status(self):
-        if self.soil >= self.target_soil:
+        if self.soil:
             return self.SENSOR_OK
         else:
             return self.SENSOR_LOW
@@ -123,10 +122,56 @@ class Greenhouse(object):
                 self.turn_colour_leds_off(colour)
 
     def _get_humidity_and_temperature(self):
-        humidity, temperature = Adafruit_DHT.read_retry(self.DHT_SENSOR, self.DHT)
+        humidity, temperature = Adafruit_DHT.read_retry(
+            sensor=self.DHT_SENSOR,
+            pin=self.DHT,
+            retries=5
+        )
         self.humidity = humidity
         self.temperature = temperature
         return (humidity, temperature)
+
+    def _get_soil_moisture(self):
+        pin = self.SOIL
+        GPIO.setup(pin, GPIO.OUT)
+        GPIO.output(pin, GPIO.LOW)
+        sleep(0.1)
+        GPIO.setup(pin, GPIO.IN)
+
+        start_time = time()
+        end_time = time()
+        while GPIO.input(pin) == GPIO.LOW:
+            end_time = time()
+            if (end_time - start_time) > 1:
+                end_time = start_time + 1
+                break
+
+        value = 100 * (1 - (end_time - start_time))
+        return value
+
+    def _get_light_level(self):
+        pin = self.LIGHT
+        GPIO.setup(pin, GPIO.OUT)
+        GPIO.output(pin, GPIO.LOW)
+        sleep(0.1)
+        GPIO.setup(pin, GPIO.IN)
+        start_time = time()
+        while GPIO.input(pin) == GPIO.LOW:
+            end_time = time()
+            if ((end_time - start_time) * 10000) > 100:
+                return 0
+        end_time = time()
+        return 100 - ((end_time - start_time) * 10000)
+
+    def _get_average_soil_moisture(self, num):
+        values = [self._get_soil_moisture() for n in range(num)]
+        average_value = sum(values) / len(values)
+        return average_value
+
+    def _get_average_light_level(self, num):
+        values = [self._get_light_level() for n in range(num)]
+        average_value = sum(values) / len(values)
+        return average_value
 
     def turn_led_on(self, colour, index):
         """
@@ -174,9 +219,9 @@ class Greenhouse(object):
 
     def get_temperature(self):
         """
-        Return temperature value from sensor
+        Return temperature value from sensor, in degrees Celsius
 
-        (use greenhouse.temperature for cached value)
+        (use self.temperature for cached value)
         """
         humidity, temperature = self._get_humidity_and_temperature()
         self.temperature = temperature
@@ -184,9 +229,9 @@ class Greenhouse(object):
 
     def get_humidity(self):
         """
-        Return humidity value from sensor
+        Return humidity value from sensor, in percentage
 
-        (use greenhouse.humidity for cached value)
+        (use self.humidity for cached value)
         """
         humidity, temperature = self._get_humidity_and_temperature()
         self.humidity = humidity
@@ -194,37 +239,22 @@ class Greenhouse(object):
 
     def get_soil(self):
         """
-        Return soil moisture value from sensor
+        Return soil moisture value from sensor, in percentage
 
-        (use greenhouse.soil for cached value)
+        (use self.soil for cached value)
         """
-        GPIO.setup(self.SOIL, GPIO.OUT)
-        GPIO.output(self.SOIL, GPIO.LOW)
-        sleep(0.1)
-        GPIO.setup(self.SOIL, GPIO.IN)
-        start_time = time()
-        while GPIO.input(self.SOIL) == GPIO.LOW:
-            pass
-        end_time = time()
-        soil_moisture = end_time - start_time
-        self.soil = soil_moisture
-        return soil_moisture
+        soil = self._get_average_soil_moisture(5)
+        self.soil = soil > 50
+        return self.soil
 
     def get_light(self):
         """
-        Return light value from sensor
+        Return light value from sensor, in percentage
 
-        (use greenhouse.light for cached value)
+        (use self.light for cached value)
         """
-        GPIO.setup(self.LIGHT, GPIO.OUT)
-        GPIO.output(self.LIGHT, GPIO.LOW)
-        sleep(0.1)
-        GPIO.setup(self.LIGHT, GPIO.IN)
-        light = 0
-        while GPIO.input(self.LIGHT) == GPIO.LOW:
-            light += 1
-        self.light = light
-        return light
+        self.light = self._get_average_light_level(5)
+        return self.light
 
     def record_sensor_values(self):
         """
@@ -233,7 +263,7 @@ class Greenhouse(object):
         timestamp = datetime.now().isoformat()
         temperature = self.temperature
         humidity = self.humidity
-        soil = self.soil
+        soil = "%0.6d" % self.soil
         light = self.light
 
         values = (timestamp, temperature, humidity, soil, light)
@@ -260,10 +290,9 @@ def main():
     greenhouse = Greenhouse()
     greenhouse.record_sensor_values()
     greenhouse.export_to_csv('/home/pi/test.csv')
-
     print("Temperature: %f" % greenhouse.temperature)
     print("Humidity: %f" % greenhouse.humidity)
-    print("Soil: %f" % greenhouse.soil)
+    print("Soil: %s" % greenhouse.soil)
     print("Light: %f" % greenhouse.light)
 
     if greenhouse.temperature_status == greenhouse.SENSOR_OK:
@@ -289,6 +318,13 @@ def main():
         print("Light ok")
     else:
         print("Light not ok")
+
+    while True:
+        for colour in greenhouse.LEDS:
+            greenhouse.turn_colour_leds_on(colour)
+            sleep(1)
+            greenhouse.turn_all_leds_off()
+            sleep(1)
 
 if __name__ == '__main__':
     main()
