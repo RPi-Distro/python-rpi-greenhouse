@@ -47,6 +47,7 @@ class Greenhouse(object):
     target_humidity_lower = 40
     target_humidity_upper = 60
 
+    target_soil = 50
     target_light = 60
 
     @property
@@ -75,7 +76,7 @@ class Greenhouse(object):
 
     @property
     def soil_status(self):
-        if self.soil:
+        if self.soil >= self.target_soil:
             return self.SENSOR_OK
         else:
             return self.SENSOR_LOW
@@ -244,7 +245,7 @@ class Greenhouse(object):
         (use self.soil for cached value)
         """
         soil = self._get_average_soil_moisture(5)
-        self.soil = soil > 50
+        self.soil = soil
         return self.soil
 
     def get_light(self):
@@ -292,7 +293,7 @@ def main():
     greenhouse.export_to_csv('/home/pi/test.csv')
     print("Temperature: %f" % greenhouse.temperature)
     print("Humidity: %f" % greenhouse.humidity)
-    print("Soil: %s" % greenhouse.soil)
+    print("Soil: %f" % greenhouse.soil)
     print("Light: %f" % greenhouse.light)
 
     if greenhouse.temperature_status == greenhouse.SENSOR_OK:
