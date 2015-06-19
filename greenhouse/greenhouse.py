@@ -47,7 +47,6 @@ class Greenhouse(object):
     target_humidity_lower = 40
     target_humidity_upper = 60
 
-    target_soil = 50
     target_light = 60
 
     @property
@@ -76,7 +75,7 @@ class Greenhouse(object):
 
     @property
     def soil_status(self):
-        if self.soil >= self.target_soil:
+        if self.soil:
             return self.SENSOR_OK
         else:
             return self.SENSOR_LOW
@@ -107,20 +106,51 @@ class Greenhouse(object):
         led = self.LEDS[colour][index]
         GPIO.output(led, on_or_off)
 
+    def _turn_led_on(self, colour, index):
+        self._turn_led_on_or_off(colour, index, on_or_off=True)
+
+    def _turn_led_off(self, colour, index):
+        self._turn_led_on_or_off(colour, index, on_or_off=False)
+
     def _turn_colour_leds_on_or_off(self, colour, on_or_off):
         leds = self.LEDS[colour]
         for led in range(len(leds)):
             if on_or_off:
-                self.turn_led_on(colour, led)
+                self._turn_led_on(colour, led)
             else:
-                self.turn_led_off(colour, led)
+                self._turn_led_off(colour, led)
+
+    def _turn_colour_leds_on(self, colour):
+        self._turn_colour_leds_on_or_off(colour=colour, on_or_off=True)
+
+    def _turn_colour_leds_off(self, colour):
+        self._turn_colour_leds_on_or_off(colour=colour, on_or_off=False)
+
+    def _turn_index_leds_on_or_off(self, index, on_or_off):
+        for colour in self.LEDS:
+            if on_or_off:
+                self._turn_led_on(colour, index)
+            else:
+                self._turn_led_off(colour, index)
+
+    def _turn_index_leds_on(self, index):
+        self._turn_index_leds_on_or_off(index=index, on_or_off=True)
+
+    def _turn_index_leds_off(self, index):
+        self._turn_index_leds_on_or_off(index=index, on_or_off=False)
 
     def _turn_all_leds_on_or_off(self, on_or_off):
         for colour in self.LEDS:
             if on_or_off:
-                self.turn_colour_leds_on(colour)
+                self._turn_colour_leds_on(colour)
             else:
-                self.turn_colour_leds_off(colour)
+                self._turn_colour_leds_off(colour)
+
+    def _turn_all_leds_on(self):
+        self._turn_all_leds_on_or_off(on_or_off=True)
+
+    def _turn_all_leds_off(self):
+        self._turn_all_leds_on_or_off(on_or_off=False)
 
     def _get_humidity_and_temperature(self):
         humidity, temperature = Adafruit_DHT.read_retry(
@@ -141,13 +171,15 @@ class Greenhouse(object):
 
         start_time = time()
         end_time = time()
+        max_time = 1
         while GPIO.input(pin) == GPIO.LOW:
             end_time = time()
-            if (end_time - start_time) > 1:
-                end_time = start_time + 1
+            if (end_time - start_time) > max_time:
+                end_time = start_time + max_time
                 break
 
-        value = 100 * (1 - (end_time - start_time))
+        time_taken = end_time - start_time
+        value = 1 - (time_taken / max_time)
         return value
 
     def _get_light_level(self):
@@ -167,56 +199,56 @@ class Greenhouse(object):
     def _get_average_soil_moisture(self, num):
         values = [self._get_soil_moisture() for n in range(num)]
         average_value = sum(values) / len(values)
-        return average_value
+        return round(average_value) == 1
 
     def _get_average_light_level(self, num):
         values = [self._get_light_level() for n in range(num)]
         average_value = sum(values) / len(values)
         return average_value
 
-    def turn_led_on(self, colour, index):
+    def turn_leds_on(self, colour=None, index=None):
         """
-        Turn a single LED on, by colour and index
+        Turn LEDs on
+        - if colour given, only that colour
+        - if index given, only that index
+        - if both given, only that LED
+        - if neither given, all LEDs
 
-        e.g. turn_led_on('red', 0)
+        e.g. turn_leds_on()
+        e.g. turn_leds_on(colour='red')
+        e.g. turn_leds_on(index=0)
+        e.g. turn_leds_on(colour='red', index=0)
         """
-        self._turn_led_on_or_off(colour, index, on_or_off=True)
+        if colour and index is not None:
+            self._turn_led_on(colour, index)
+        elif colour:
+            self._turn_colour_leds_on(colour)
+        elif index is not None:
+            self._turn_index_leds_on(index)
+        else:
+            self._turn_all_leds_on()
 
-    def turn_led_off(self, colour, index):
+    def turn_leds_off(self, colour=None, index=None):
         """
-        Turn a single LED off, by colour and index
+        Turn LEDs off
+        - if colour given, only that colour
+        - if index given, only that index
+        - if both given, only that LED
+        - if neither given, all LEDs
 
-        e.g. turn_led_off('red', 0)
+        e.g. turn_leds_off()
+        e.g. turn_leds_off(colour='red')
+        e.g. turn_leds_off(index=0)
+        e.g. turn_leds_off(colour='red', index=0)
         """
-        self._turn_led_on_or_off(colour, index, on_or_off=False)
-
-    def turn_colour_leds_on(self, colour):
-        """
-        Turn all LEDs of a particular colour on
-
-        e.g. turn_colour_leds_on('red')
-        """
-        self._turn_colour_leds_on_or_off(colour, on_or_off=True)
-
-    def turn_colour_leds_off(self, colour):
-        """
-        Turn all LEDs of a particular colour off
-
-        e.g. turn_colour_leds_off('red')
-        """
-        self._turn_colour_leds_on_or_off(colour, on_or_off=False)
-
-    def turn_all_leds_on(self):
-        """
-        Turn all LEDs on
-        """
-        self._turn_all_leds_on_or_off(on_or_off=True)
-
-    def turn_all_leds_off(self):
-        """
-        Turn all LEDs off
-        """
-        self._turn_all_leds_on_or_off(on_or_off=False)
+        if colour and index:
+            self._turn_led_off(colour, index)
+        elif colour:
+            self._turn_colour_leds_off(colour)
+        elif index:
+            self._turn_index_leds_off(index)
+        else:
+            self._turn_all_leds_off()
 
     def get_temperature(self):
         """
@@ -240,7 +272,7 @@ class Greenhouse(object):
 
     def get_soil(self):
         """
-        Return soil moisture value from sensor, in percentage
+        Return soil moisture value from sensor - True (wet) or False (dry)
 
         (use self.soil for cached value)
         """
@@ -264,7 +296,7 @@ class Greenhouse(object):
         timestamp = datetime.now().isoformat()
         temperature = self.temperature
         humidity = self.humidity
-        soil = "%0.6d" % self.soil
+        soil = "%i" % self.soil
         light = self.light
 
         values = (timestamp, temperature, humidity, soil, light)
@@ -298,6 +330,7 @@ def main():
 
     if greenhouse.temperature_status == greenhouse.SENSOR_OK:
         print("Temperature ok")
+        greenhouse.turn_leds_on('green')
     elif greenhouse.temperature_status == greenhouse.SENSOR_LOW:
         print("Temperature too low")
     elif greenhouse.temperature_status == greenhouse.SENSOR_HIGH:
@@ -319,13 +352,6 @@ def main():
         print("Light ok")
     else:
         print("Light not ok")
-
-    while True:
-        for colour in greenhouse.LEDS:
-            greenhouse.turn_colour_leds_on(colour)
-            sleep(1)
-            greenhouse.turn_all_leds_off()
-            sleep(1)
 
 if __name__ == '__main__':
     main()
