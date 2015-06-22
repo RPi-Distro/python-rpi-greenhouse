@@ -37,9 +37,9 @@ class Greenhouse(object):
     SOIL = 26
     LIGHT = 18
 
-    SENSOR_LOW = -1
-    SENSOR_OK = 0
-    SENSOR_HIGH = 1
+    SENSOR_LOW = 'low'
+    SENSOR_OK = 'ok'
+    SENSOR_HIGH = 'high'
 
     target_temperature_lower = 20
     target_temperature_upper = 30
@@ -50,9 +50,9 @@ class Greenhouse(object):
     target_light = 60
 
     status_colours = {
-        self.SENSOR_OK: 'green',
-        self.SENSOR_LOW: 'blue',
-        self.SENSOR_HIGH: 'red',
+        SENSOR_LOW: 'blue',
+        SENSOR_OK: 'green',
+        SENSOR_HIGH: 'red',
     }
 
     @property
@@ -93,9 +93,13 @@ class Greenhouse(object):
         else:
             return self.SENSOR_LOW
 
-    def __init__(self):
+    def __init__(self, use_sensors=True):
+        self.use_sensors = use_sensors
         self._setup_gpio()
-        self._init_sensors()
+        if use_sensors:
+            self.update_sensor_values()
+        else:
+            self._get_sensor_values_from_database()
 
     def _setup_gpio(self):
         for colour in self.LEDS:
@@ -103,10 +107,24 @@ class Greenhouse(object):
                 GPIO.setup(led, GPIO.OUT)
                 GPIO.output(led, False)
 
-    def _init_sensors(self):
-        self._get_humidity_and_temperature()
-        self.get_soil()
-        self.get_light()
+    def _get_sensor_values_from_database(self):
+        cursor.execute("""
+            SELECT
+                *
+            FROM
+                greenhouse
+            ORDER BY
+                datetime(datetime) DESC
+            LIMIT
+                0, 1
+        """)
+        result = cursor.fetchone()
+        datetime, temperature, humidity, soil, light = result
+
+        self.temperature = temperature
+        self.humidity = humidity
+        self.soil = soil
+        self.light = light
 
     def _turn_led_on_or_off(self, colour, index, on_or_off):
         led = self.LEDS[colour][index]
@@ -212,6 +230,13 @@ class Greenhouse(object):
         average_value = sum(values) / len(values)
         return average_value
 
+    def _get_timestamp(self):
+        dt = datetime.now()
+        dt_date = str(dt.date())
+        dt_time = str(dt.time())
+        timestamp = "%s %s" % (dt_date, dt_time[:8])
+        return timestamp
+
     def turn_leds_on(self, colour=None, index=None):
         """
         Turn LEDs on
@@ -256,12 +281,20 @@ class Greenhouse(object):
         else:
             self._turn_all_leds_off()
 
+    def update_sensor_values(self):
+        self._get_humidity_and_temperature()
+        self.get_soil()
+        self.get_light()
+
     def get_temperature(self):
         """
         Return temperature value from sensor, in degrees Celsius
 
         (use self.temperature for cached value)
         """
+        if not self.use_sensors:
+            raise Exception('Initialised without sensors.')
+
         humidity, temperature = self._get_humidity_and_temperature()
         self.temperature = temperature
         return temperature
@@ -272,6 +305,9 @@ class Greenhouse(object):
 
         (use self.humidity for cached value)
         """
+        if not self.use_sensors:
+            raise Exception('Initialised without sensors.')
+
         humidity, temperature = self._get_humidity_and_temperature()
         self.humidity = humidity
         return humidity
@@ -282,6 +318,9 @@ class Greenhouse(object):
 
         (use self.soil for cached value)
         """
+        if not self.use_sensors:
+            raise Exception('Initialised without sensors.')
+
         soil = self._get_average_soil_moisture(5)
         self.soil = soil
         return self.soil
@@ -292,6 +331,9 @@ class Greenhouse(object):
 
         (use self.light for cached value)
         """
+        if not self.use_sensors:
+            raise Exception('Initialised without sensors.')
+
         self.light = self._get_average_light_level(5)
         return self.light
 
@@ -299,7 +341,10 @@ class Greenhouse(object):
         """
         Save sensor readings to database
         """
-        timestamp = datetime.now().isoformat()
+        if not self.use_sensors:
+            raise Exception('Initialised without sensors.')
+
+        timestamp = self._get_timestamp()
         temperature = self.temperature
         humidity = self.humidity
         soil = "%i" % self.soil
@@ -307,8 +352,10 @@ class Greenhouse(object):
 
         values = (timestamp, temperature, humidity, soil, light)
         cursor.execute("""
-            INSERT INTO greenhouse
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO
+                greenhouse
+            VALUES
+                (?, ?, ?, ?, ?)
         """, values)
         db.commit()
 
@@ -316,7 +363,12 @@ class Greenhouse(object):
         """
         Export sensor data from database and save as CSV file in file_path
         """
-        cursor.execute("SELECT * from greenhouse")
+        cursor.execute("""
+            SELECT
+                *
+            FROM
+                greenhouse
+        """)
         results = cursor.fetchall()
         with open(file_path, 'w') as f:
             for result in results:
@@ -328,6 +380,9 @@ class Greenhouse(object):
         """
         Use LEDs to indicate sensor statuses according to self.status_colours
         """
+        if not self.use_sensors:
+            self._get_sensor_values_from_database()
+
         sensor_statuses = [
             self.temperature_status,
             self.humidity_status,
@@ -336,7 +391,7 @@ class Greenhouse(object):
         ]
 
         for status in sensor_statuses:
-            colour = status_colours[status]
+            colour = self.status_colours[status]
             self.turn_leds_on(colour)
             sleep(2)
             self.turn_leds_off(colour)
@@ -352,26 +407,26 @@ def main():
     print("Soil: %f" % greenhouse.soil)
     print("Light: %f" % greenhouse.light)
 
-    if greenhouse.temperature_status == greenhouse.SENSOR_OK:
+    if greenhouse.temperature_status == 'ok':
         print("Temperature ok")
-    elif greenhouse.temperature_status == greenhouse.SENSOR_LOW:
+    elif greenhouse.temperature_status == 'low':
         print("Temperature too low")
-    elif greenhouse.temperature_status == greenhouse.SENSOR_HIGH:
+    elif greenhouse.temperature_status == 'high':
         print("Temperature too high")
 
-    if greenhouse.humidity_status == greenhouse.SENSOR_OK:
+    if greenhouse.humidity_status == 'ok':
         print("Humidity ok")
-    elif greenhouse.humidity_status == greenhouse.SENSOR_LOW:
+    elif greenhouse.humidity_status == 'low':
         print("Humidity too low")
-    elif greenhouse.humidity_status == greenhouse.SENSOR_HIGH:
+    elif greenhouse.humidity_status == 'high':
         print("Humidity too high")
 
-    if greenhouse.soil_status == greenhouse.SENSOR_OK:
+    if greenhouse.soil_status == 'ok':
         print("Soil ok")
     else:
         print("Soil too dry")
 
-    if greenhouse.light_status == greenhouse.SENSOR_OK:
+    if greenhouse.light_status == 'ok':
         print("Light ok")
     else:
         print("Light not ok")
