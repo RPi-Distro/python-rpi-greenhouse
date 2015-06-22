@@ -49,6 +49,12 @@ class Greenhouse(object):
 
     target_light = 60
 
+    status_colours = {
+        self.SENSOR_OK: 'green',
+        self.SENSOR_LOW: 'blue',
+        self.SENSOR_HIGH: 'red',
+    }
+
     @property
     def temperature_status(self):
         lower = self.target_temperature_lower
@@ -318,6 +324,24 @@ class Greenhouse(object):
                     f.write('%s,' % data)
                 f.write('\n')
 
+    def show_status_on_leds(self):
+        """
+        Use LEDs to indicate sensor statuses according to self.status_colours
+        """
+        sensor_statuses = [
+            self.temperature_status,
+            self.humidity_status,
+            self.soil_status,
+            self.light_status,
+        ]
+
+        for status in sensor_statuses:
+            colour = status_colours[status]
+            self.turn_leds_on(colour)
+            sleep(2)
+            self.turn_leds_off(colour)
+            sleep(0.1)
+
 
 def main():
     greenhouse = Greenhouse()
@@ -330,7 +354,6 @@ def main():
 
     if greenhouse.temperature_status == greenhouse.SENSOR_OK:
         print("Temperature ok")
-        greenhouse.turn_leds_on('green')
     elif greenhouse.temperature_status == greenhouse.SENSOR_LOW:
         print("Temperature too low")
     elif greenhouse.temperature_status == greenhouse.SENSOR_HIGH:
@@ -352,6 +375,11 @@ def main():
         print("Light ok")
     else:
         print("Light not ok")
+
+    while True:
+        greenhouse.show_status_on_leds()
+        sleep(5)
+
 
 if __name__ == '__main__':
     main()
