@@ -41,20 +41,6 @@ class Greenhouse(object):
     SENSOR_OK = 'ok'
     SENSOR_HIGH = 'high'
 
-    target_temperature_lower = 20
-    target_temperature_upper = 30
-
-    target_humidity_lower = 40
-    target_humidity_upper = 60
-
-    target_light = 60
-
-    status_colours = {
-        SENSOR_LOW: 'blue',
-        SENSOR_OK: 'green',
-        SENSOR_HIGH: 'red',
-    }
-
     @property
     def temperature_status(self):
         lower = self.target_temperature_lower
@@ -95,7 +81,23 @@ class Greenhouse(object):
 
     def __init__(self, use_sensors=True):
         self.use_sensors = use_sensors
+
+        self.target_temperature_lower = 20
+        self.target_temperature_upper = 30
+
+        self.target_humidity_lower = 40
+        self.target_humidity_upper = 60
+
+        self.target_light = 60
+
+        self.status_colours = {
+            self.SENSOR_LOW: 'blue',
+            self.SENSOR_OK: 'green',
+            self.SENSOR_HIGH: 'red',
+        }
+
         self._setup_gpio()
+
         if use_sensors:
             self.update_sensor_values()
         else:
