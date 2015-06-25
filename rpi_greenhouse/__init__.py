@@ -3,4 +3,4 @@ from .greenhouse_logger import GreenhouseLogger
 from .greenhouse import Greenhouse
 
 
-__version__ = '0.1.1'
+__version__ = '0.2.0'
