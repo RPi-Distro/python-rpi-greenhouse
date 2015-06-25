@@ -91,7 +91,7 @@ class GreenhouseLogger(object):
             ):
             end_time = time()
         time_taken = end_time - start_time
-        return time_taken
+        return min(time_taken, self.darkness_level)
 
     def _get_average_soil_moisture(self, num):
         values = [self._get_soil_moisture() for n in range(num)]
