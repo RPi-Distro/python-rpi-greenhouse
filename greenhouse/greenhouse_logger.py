@@ -4,6 +4,7 @@ import Adafruit_DHT
 import sqlite3 as sqlite
 from datetime import datetime
 from time import sleep, time
+import math
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -31,6 +32,8 @@ class GreenhouseLogger(object):
     LIGHT = 18
 
     def __init__(self):
+        self.darkness_level = 0.01
+
         self.humidity, self.temperature = self._get_humidity_and_temperature()
         self.soil = self._get_average_soil_moisture(5)
         self.light = self._get_average_light_level(5)
@@ -46,38 +49,49 @@ class GreenhouseLogger(object):
         return (humidity, temperature)
 
     def _get_soil_moisture(self):
+        time_taken = self._time_charging_soil_capacitor()
+        totally_wet_time = 8E-6
+        totally_dry_time = 0.01
+        moisture = (
+            math.log(time_taken / totally_dry_time) /
+            math.log(totally_wet_time / totally_dry_time)
+        )
+        return max(0, min(1, moisture)) * 100
+
+    def _time_charging_soil_capacitor(self):
         pin = self.SOIL
         GPIO.setup(pin, GPIO.OUT)
         GPIO.output(pin, GPIO.LOW)
         sleep(0.1)
         GPIO.setup(pin, GPIO.IN)
-
         start_time = time()
         end_time = time()
         max_time = 1
-        while GPIO.input(pin) == GPIO.LOW:
+        while GPIO.input(pin) == GPIO.LOW and time() - start_time < max_time:
             end_time = time()
-            if (end_time - start_time) > max_time:
-                end_time = start_time + max_time
-                break
-
         time_taken = end_time - start_time
-        value = 1 - (time_taken / max_time)
-        return value
+        return time_taken
 
     def _get_light_level(self):
+        time_taken = self._time_charging_light_capacitor()
+        value = 100 * time_taken / self.darkness_level
+        return 100 - value
+
+    def _time_charging_light_capacitor(self):
         pin = self.LIGHT
         GPIO.setup(pin, GPIO.OUT)
         GPIO.output(pin, GPIO.LOW)
         sleep(0.1)
         GPIO.setup(pin, GPIO.IN)
         start_time = time()
-        while GPIO.input(pin) == GPIO.LOW:
-            end_time = time()
-            if ((end_time - start_time) * 10000) > 100:
-                return 0
         end_time = time()
-        return 100 - ((end_time - start_time) * 10000)
+        while (
+                GPIO.input(pin) == GPIO.LOW and
+                time() - start_time < self.darkness_level
+            ):
+            end_time = time()
+        time_taken = end_time - start_time
+        return time_taken
 
     def _get_average_soil_moisture(self, num):
         values = [self._get_soil_moisture() for n in range(num)]
