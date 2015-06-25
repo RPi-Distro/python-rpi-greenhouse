@@ -14,10 +14,12 @@ Sensors
 * Soil Moisture sesnsor
 * Light sensor (LDR)
 * LEDs
- * 3x white
- * 3x red
- * 3x blue
- * 3x green
+
+  - 3x white
+  - 3x red
+  - 3x blue
+  - 3x green
+    
 * Real Time Clock (DS1307)
 
 Contributors
