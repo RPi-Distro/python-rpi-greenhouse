@@ -14,10 +14,10 @@ Sensors
 * Soil Moisture sesnsor
 * Light sensor (LDR)
 * LEDs
-    * 3x white
-    * 3x red
-    * 3x blue
-    * 3x green
+ * 3x white
+ * 3x red
+ * 3x blue
+ * 3x green
 * Real Time Clock (DS1307)
 
 Contributors
@@ -42,4 +42,4 @@ Open Source
 .. _Luke Wren: https://github.com/wren6991
 .. _BSD Licence: http://opensource.org/licenses/BSD-3-Clause
 .. _GitHub: https://github.com/bennuttall/rpi-greenhouse
-.. _GitHub: https://github.com/bennuttall/rpi-greenhouse/issues
+.. _GitHub Issues: https://github.com/bennuttall/rpi-greenhouse/issues
