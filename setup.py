@@ -7,7 +7,7 @@ def read(fname):
 
 setup(
     name="rpi_greenhouse",
-    version="0.1.0",
+    version="0.1.1",
     author="Ben Nuttall",
     author_email="ben@raspberrypi.org",
     description="Simple interface to Raspberry Pi Robot Greenhouse add-on board",
@@ -24,7 +24,6 @@ setup(
     packages=find_packages(),
     install_requires=[
         "RPi.GPIO",
-        "sqlite3"
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",
