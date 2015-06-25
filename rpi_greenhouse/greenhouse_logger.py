@@ -1,11 +1,17 @@
 from __future__ import print_function, division
 from RPi import GPIO
-import Adafruit_DHT
 import sqlite3 as sqlite
 from greenhouse_database import GreenhouseDatabase
 from datetime import datetime
 from time import sleep, time
 import math
+from sys import exit
+
+try:
+    import Adafruit_DHT
+except ImportError:
+    print("Adafruit DHT library missing.")
+    exit(0)
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
