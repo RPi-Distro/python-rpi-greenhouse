@@ -10,6 +10,13 @@ GPIO.setwarnings(False)
 db = GreenhouseDatabase()
 
 class Greenhouse(object):
+    LED_COLOURS = [
+        'white',
+        'red',
+        'blue',
+        'green',
+    ]
+
     LEDS = {
         'white': [13, 9, 27],
         'red': [16, 11, 23],
