@@ -2,6 +2,7 @@ from __future__ import print_function, division
 from RPi import GPIO
 import Adafruit_DHT
 import sqlite3 as sqlite
+from greenhouse_database import GreenhouseDatabase
 from datetime import datetime
 from time import sleep, time
 import math
@@ -9,20 +10,7 @@ import math
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-db = sqlite.connect("/home/pi/db/greenhouse.db")
-cursor = db.cursor()
-
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS
-        greenhouse (
-            datetime TEXT,
-            temperature REAL,
-            humidity REAL,
-            soil REAL,
-            light REAL
-        )
-""")
-db.commit()
+db = GreenhouseDatabase()
 
 
 class GreenhouseLogger(object):
@@ -121,14 +109,8 @@ class GreenhouseLogger(object):
         light = self.light
 
         values = (timestamp, temperature, humidity, soil, light)
-        cursor.execute("""
-            INSERT INTO
-                greenhouse
-            VALUES
-                (?, ?, ?, ?, ?)
-        """, values)
-        db.commit()
 
+        db.record_sensor_values(values)
 
 def main():
     logger = GreenhouseLogger()

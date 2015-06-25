@@ -1,26 +1,13 @@
 from __future__ import print_function, division
 from RPi import GPIO
 import sqlite3 as sqlite
+from greenhouse_database import GreenhouseDatabase
 from time import sleep
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-db = sqlite.connect("/home/pi/db/greenhouse.db")
-cursor = db.cursor()
-
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS
-        greenhouse (
-            datetime TEXT,
-            temperature REAL,
-            humidity REAL,
-            soil REAL,
-            light REAL
-        )
-""")
-db.commit()
-
+db = GreenhouseDatabase()
 
 class Greenhouse(object):
     LEDS = {
@@ -55,19 +42,19 @@ class Greenhouse(object):
 
     @property
     def temperature(self):
-        return self._get_sensor_value_from_database('temperature')
+        return db.get_sensor_value('temperature')
 
     @property
     def humidity(self):
-        return self._get_sensor_value_from_database('humidity')
+        return db.get_sensor_value('humidity')
 
     @property
     def soil(self):
-        return self._get_sensor_value_from_database('soil')
+        return db.get_sensor_value('soil')
 
     @property
     def light(self):
-        return self._get_sensor_value_from_database('light')
+        return db.get_sensor_value('light')
 
     @property
     def temperature_status(self):
@@ -112,27 +99,6 @@ class Greenhouse(object):
             for led in self.LEDS[colour]:
                 GPIO.setup(led, GPIO.OUT)
                 GPIO.output(led, False)
-
-    def _get_sensor_value_from_database(self, sensor):
-        cursor.execute("""
-            SELECT
-                *
-            FROM
-                greenhouse
-            ORDER BY
-                datetime(datetime) DESC
-            LIMIT
-                0, 1
-        """)
-        result = cursor.fetchone()
-        datetime, temperature, humidity, soil, light = result
-        sensor_values = {
-            'temperature': temperature,
-            'humidity': humidity,
-            'soil': soil,
-            'light': light,
-        }
-        return sensor_values[sensor]
 
     def _turn_led_on_or_off(self, colour, index, on_or_off):
         led = self.LEDS[colour][index]
@@ -232,18 +198,7 @@ class Greenhouse(object):
         """
         Export sensor data from database and save as CSV file in file_path
         """
-        cursor.execute("""
-            SELECT
-                *
-            FROM
-                greenhouse
-        """)
-        results = cursor.fetchall()
-        with open(file_path, 'w') as f:
-            for result in results:
-                for data in result:
-                    f.write('%s,' % data)
-                f.write('\n')
+        db.export_to_csv()
 
     def show_status_on_leds(self):
         """
