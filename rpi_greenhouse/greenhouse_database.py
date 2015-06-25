@@ -76,11 +76,10 @@ class GreenhouseDatabase(object):
     def export_to_csv(self, file_path=None):
         """
         Export sensor data from database and save as CSV file in file_path
-        file_path defaults to ~/greenhouse.csv
+        file_path defaults to /home/pi/greenhouse.csv
         """
         if file_path is None:
-            file_path = '/'.join([os.getenv("HOME"), 'greenhouse.csv'])
-
+            file_path = '/home/pi/greenhouse.csv'
         self.cursor.execute("""
             SELECT
                 *

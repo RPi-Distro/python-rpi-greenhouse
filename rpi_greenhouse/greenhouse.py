@@ -194,11 +194,11 @@ class Greenhouse(object):
         else:
             self._turn_all_leds_off()
 
-    def export_to_csv(self, file_path):
+    def export_to_csv(self, file_path=None):
         """
         Export sensor data from database and save as CSV file in file_path
         """
-        db.export_to_csv()
+        db.export_to_csv(file_path)
 
     def show_status_on_leds(self):
         """
@@ -221,7 +221,7 @@ class Greenhouse(object):
 
 def main():
     greenhouse = Greenhouse()
-    greenhouse.export_to_csv('/home/pi/test.csv')
+    greenhouse.export_to_csv()
     print("Temperature:")
     print(greenhouse.temperature)
     print("Humidity:")
