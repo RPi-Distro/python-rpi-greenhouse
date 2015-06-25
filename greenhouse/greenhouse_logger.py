@@ -133,10 +133,14 @@ class GreenhouseLogger(object):
 def main():
     logger = GreenhouseLogger()
     logger.record_sensor_values()
-    print("Temperature: %f" % logger.temperature)
-    print("Humidity: %f" % logger.humidity)
-    print("Soil: %f" % logger.soil)
-    print("Light: %f" % logger.light)
+    print("Temperature:")
+    print(logger.temperature)
+    print("Humidity:")
+    print(logger.humidity)
+    print("Soil:")
+    print(logger.soil)
+    print("Light:")
+    print(logger.light)
 
 if __name__ == '__main__':
     main()

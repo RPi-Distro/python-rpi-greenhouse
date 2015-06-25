@@ -249,8 +249,6 @@ class Greenhouse(object):
         """
         Use LEDs to indicate sensor statuses according to self.status_colours
         """
-        self._get_sensor_values_from_database()
-
         sensor_statuses = [
             self.temperature_status,
             self.humidity_status,
@@ -269,10 +267,14 @@ class Greenhouse(object):
 def main():
     greenhouse = Greenhouse()
     greenhouse.export_to_csv('/home/pi/test.csv')
-    print("Temperature: %f" % greenhouse.temperature)
-    print("Humidity: %f" % greenhouse.humidity)
-    print("Soil: %f" % greenhouse.soil)
-    print("Light: %f" % greenhouse.light)
+    print("Temperature:")
+    print(greenhouse.temperature)
+    print("Humidity:")
+    print(greenhouse.humidity)
+    print("Soil:")
+    print(greenhouse.soil)
+    print("Light:")
+    print(greenhouse.light)
 
     if greenhouse.temperature_status == 'ok':
         print("Temperature ok")
