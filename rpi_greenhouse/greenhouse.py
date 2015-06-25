@@ -185,11 +185,11 @@ class Greenhouse(object):
         e.g. turn_leds_off(index=0)
         e.g. turn_leds_off(colour='red', index=0)
         """
-        if colour and index:
+        if colour and index is not None:
             self._turn_led_off(colour, index)
         elif colour:
             self._turn_colour_leds_off(colour)
-        elif index:
+        elif index is not None:
             self._turn_index_leds_off(index)
         else:
             self._turn_all_leds_off()
