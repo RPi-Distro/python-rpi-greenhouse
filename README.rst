@@ -13,13 +13,18 @@ Sensors
 * Temperature and Humidity sensor (DHT22)
 * Soil Moisture sesnsor
 * Light sensor (LDR)
-* LEDs
 
-  - 3x white
-  - 3x red
-  - 3x blue
-  - 3x green
+LEDs
+----
+
+* 3x white
+* 3x red
+* 3x blue
+* 3x green
     
+RTC
+---
+
 * Real Time Clock (DS1307)
 
 Contributors
