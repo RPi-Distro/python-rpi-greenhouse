@@ -32,8 +32,8 @@ class Greenhouse(object):
         self.target_temperature_lower = 20
         self.target_temperature_upper = 30
 
-        self.target_humidity_lower = 40
-        self.target_humidity_upper = 60
+        self.target_humidity_lower = 60
+        self.target_humidity_upper = 85
 
         self.target_soil = 60
 
