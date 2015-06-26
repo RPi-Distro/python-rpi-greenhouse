@@ -118,9 +118,17 @@ class GreenhouseLogger(object):
 
         db.record_sensor_values(values)
 
+    def export_to_csv(self, file_path=None):
+        """
+        Export sensor data from database and save as CSV file in file_path
+        Defaults to /home/pi/greenhouse.csv
+        """
+        db.export_to_csv(file_path)
+
 def main():
     logger = GreenhouseLogger()
     logger.record_sensor_values()
+    logger.export_to_csv()
     print("Temperature:")
     print(logger.temperature)
     print("Humidity:")
