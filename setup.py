@@ -7,7 +7,7 @@ def read(fname):
 
 setup(
     name="rpi_greenhouse",
-    version="0.2.4",
+    version="0.3.0",
     author="Ben Nuttall",
     author_email="ben@raspberrypi.org",
     description="Simple interface to Raspberry Pi Robot Greenhouse add-on board",
