@@ -1,13 +1,10 @@
 from __future__ import print_function, division
 from RPi import GPIO
-import sqlite3 as sqlite
 from greenhouse_database import GreenhouseDatabase
 from time import sleep
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
-
-db = GreenhouseDatabase()
 
 class GreenhouseIndicator(object):
     LED_COLOURS = [
@@ -28,7 +25,12 @@ class GreenhouseIndicator(object):
     SENSOR_OK = 'ok'
     SENSOR_HIGH = 'high'
 
-    def __init__(self):
+    def __init__(self, db_path='/home/pi/.greenhouse/greenhouse.db'):
+        """
+        db_path defaults to /home/pi/.greenhouse/greenhouse.db
+        """
+        self.db = GreenhouseDatabase(db_path)
+
         self.target_temperature_lower = 20
         self.target_temperature_upper = 30
 
@@ -49,19 +51,19 @@ class GreenhouseIndicator(object):
 
     @property
     def temperature(self):
-        return db.get_sensor_value('temperature')
+        return self.db.get_sensor_value('temperature')
 
     @property
     def humidity(self):
-        return db.get_sensor_value('humidity')
+        return self.db.get_sensor_value('humidity')
 
     @property
     def soil(self):
-        return db.get_sensor_value('soil')
+        return self.db.get_sensor_value('soil')
 
     @property
     def light(self):
-        return db.get_sensor_value('light')
+        return self.db.get_sensor_value('light')
 
     @property
     def temperature_status(self):

@@ -2,16 +2,11 @@ import os
 import sqlite3 as sqlite
 
 class GreenhouseDatabase(object):
-    DEFAULT_DB_PATH = '/'.join([os.getenv("HOME"), '.greenhouse/greenhouse.db'])
-
-    def __init__(self, db_path=None):
+    def __init__(self, db_path='/home/pi/.greenhouse/greenhouse.db'):
         """
         Connect to SQLite database.
-        If db_path is not given, uses ~/.greenhouse/greenhouse.db by default
+        db_path defaults to /home/pi/.greenhouse/greenhouse.db
         """
-        if db_path is None:
-            db_path = self.DEFAULT_DB_PATH
-
         path = '/'.join(db_path.split('/')[:-1])
         filename = db_path.split('/')[:-1]
 
@@ -80,13 +75,16 @@ class GreenhouseDatabase(object):
         """
         if file_path is None:
             file_path = '/home/pi/greenhouse.csv'
+
         self.cursor.execute("""
             SELECT
                 *
             FROM
                 greenhouse
         """)
+
         results = self.cursor.fetchall()
+
         with open(file_path, 'w') as f:
             f.write('Date/Time,Temperature,Humidity,Soil Moisture,Light\n')
             for result in results:

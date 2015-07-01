@@ -3,4 +3,4 @@ from .greenhouse import Greenhouse
 from .greenhouse_indicator import GreenhouseIndicator
 
 
-__version__ = '0.3.3'
+__version__ = '0.3.4'

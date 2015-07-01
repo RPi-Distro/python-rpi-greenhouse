@@ -1,6 +1,5 @@
 from __future__ import print_function, division
 from RPi import GPIO
-import sqlite3 as sqlite
 from greenhouse_database import GreenhouseDatabase
 from datetime import datetime
 from time import sleep, time
@@ -16,8 +15,6 @@ except ImportError:
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-db = GreenhouseDatabase()
-
 
 class Greenhouse(object):
     DHT_SENSOR = Adafruit_DHT.DHT22
@@ -25,7 +22,12 @@ class Greenhouse(object):
     SOIL = 26
     LIGHT = 18
 
-    def __init__(self):
+    def __init__(self, db_path='/home/pi/.greenhouse/greenhouse.db'):
+        """
+        db_path defaults to /home/pi/.greenhouse/greenhouse.db
+        """
+        self.db = GreenhouseDatabase(db_path)
+
         self.darkness_level = 0.01
 
     @property
@@ -128,14 +130,14 @@ class Greenhouse(object):
 
         values = (timestamp, temperature, humidity, soil, light)
 
-        db.record_sensor_values(values)
+        self.db.record_sensor_values(values)
 
     def export_to_csv(self, file_path='/home/pi/greenhouse.csv'):
         """
         Export sensor data from database and save as CSV file in file_path
         Defaults to /home/pi/greenhouse.csv
         """
-        db.export_to_csv(file_path)
+        self.db.export_to_csv(file_path)
 
 def main():
     greenhouse = Greenhouse()
