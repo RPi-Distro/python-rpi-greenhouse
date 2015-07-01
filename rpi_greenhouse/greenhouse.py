@@ -28,9 +28,23 @@ class Greenhouse(object):
     def __init__(self):
         self.darkness_level = 0.01
 
-        self.humidity, self.temperature = self._get_humidity_and_temperature()
-        self.soil = self._get_average_soil_moisture(5)
-        self.light = self._get_average_light_level(5)
+    @property
+    def temperature(self):
+        humidity, temperature = self._get_humidity_and_temperature()
+        return temperature
+
+    @property
+    def humidity(self):
+        humidity, temperature = self._get_humidity_and_temperature()
+        return humidity
+
+    @property
+    def soil(self):
+        return self._get_average_soil_moisture(5)
+
+    @property
+    def light(self):
+        return self._get_average_light_level(5)
 
     def _get_humidity_and_temperature(self):
         humidity, temperature = Adafruit_DHT.read_retry(
@@ -41,16 +55,6 @@ class Greenhouse(object):
         self.humidity = humidity
         self.temperature = temperature
         return (humidity, temperature)
-
-    def _get_soil_moisture(self):
-        time_taken = self._time_charging_soil_capacitor()
-        totally_wet_time = 8E-6
-        totally_dry_time = 0.01
-        moisture = (
-            math.log(time_taken / totally_dry_time) /
-            math.log(totally_wet_time / totally_dry_time)
-        )
-        return max(0, min(1, moisture)) * 100
 
     def _time_charging_soil_capacitor(self):
         pin = self.SOIL
