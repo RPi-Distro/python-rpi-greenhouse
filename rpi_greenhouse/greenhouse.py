@@ -52,8 +52,6 @@ class Greenhouse(object):
             pin=self.DHT,
             retries=5
         )
-        self.humidity = humidity
-        self.temperature = temperature
         return (humidity, temperature)
 
     def _time_charging_soil_capacitor(self):
