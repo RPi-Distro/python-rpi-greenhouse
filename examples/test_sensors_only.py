@@ -1,8 +1,7 @@
-from greenhouse_logger import GreenhouseLogger
+from rpi_greenhouse import Greenhouse
 from time import sleep
 
-logger = GreenhouseLogger()
-while True:
-    logger.record_sensor_values()
-    print("done")
-    sleep(30)
+greenhouse = Greenhouse()
+
+greenhouse.record_sensor_values()
+greenhouse.export_to_csv()

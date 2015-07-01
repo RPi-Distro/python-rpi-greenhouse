@@ -1,12 +1,12 @@
-from greenhouse import Greenhouse
+from rpi_greenhouse import GreenhouseIndicator
 from time import sleep
 
-greenhouse = Greenhouse()
+indicator = GreenhouseIndicator()
 
 while True:
     print("All on")
-    greenhouse.turn_leds_on()
+    indicator.turn_leds_on()
     sleep(0.5)
     print("All off")
-    greenhouse.turn_leds_off()
+    indicator.turn_leds_off()
     sleep(0.5)

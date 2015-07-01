@@ -1,8 +1,8 @@
-from greenhouse import Greenhouse
+from rpi_greenhouse import GreenhouseIndicator
 from time import sleep
 
-greenhouse = Greenhouse()
+indicator = GreenhouseIndicator()
 
 while True:
-    greenhouse.show_status_on_leds()
+    indicator.show_status_on_leds()
     sleep(5)
