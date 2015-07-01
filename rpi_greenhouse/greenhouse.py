@@ -54,6 +54,16 @@ class Greenhouse(object):
         )
         return (humidity, temperature)
 
+    def _get_soil_moisture(self):
+        time_taken = self._time_charging_soil_capacitor()
+        totally_wet_time = 8E-6
+        totally_dry_time = 0.01
+        moisture = (
+            math.log(time_taken / totally_dry_time) /
+            math.log(totally_wet_time / totally_dry_time)
+        )
+        return max(0, min(1, moisture)) * 100
+
     def _time_charging_soil_capacitor(self):
         pin = self.SOIL
         GPIO.setup(pin, GPIO.OUT)
