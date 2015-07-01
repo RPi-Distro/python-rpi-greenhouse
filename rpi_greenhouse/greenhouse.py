@@ -130,7 +130,7 @@ class Greenhouse(object):
 
         db.record_sensor_values(values)
 
-    def export_to_csv(self, file_path=None):
+    def export_to_csv(self, file_path='/home/pi/greenhouse.csv'):
         """
         Export sensor data from database and save as CSV file in file_path
         Defaults to /home/pi/greenhouse.csv
