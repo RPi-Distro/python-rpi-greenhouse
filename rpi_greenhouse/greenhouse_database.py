@@ -1,6 +1,7 @@
 import os
 import sqlite3 as sqlite
 
+
 class GreenhouseDatabase(object):
     def __init__(self, db_path='/home/pi/.greenhouse/greenhouse.db'):
         """
@@ -91,6 +92,7 @@ class GreenhouseDatabase(object):
                 for data in result:
                     f.write('%s,' % data)
                 f.write('\n')
+
 
 def main():
     db = GreenhouseDatabase()

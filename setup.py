@@ -1,16 +1,22 @@
 import os
 from setuptools import setup, find_packages
+from rpi_greenhouse import __version__
+
+
+description = """
+    Simple interface to Raspberry Pi Plantpot Greenhouse add-on board
+"""
 
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name="rpi_greenhouse",
-    version="0.3.4",
+    name="rpi-greenhouse",
+    version=__version__,
     author="Ben Nuttall",
     author_email="ben@raspberrypi.org",
-    description="Simple interface to Raspberry Pi Robot Greenhouse add-on board",
+    description=description.strip(),
     long_description=read('README.rst'),
     license="BSD",
     keywords=[
@@ -26,7 +32,7 @@ setup(
         "RPi.GPIO",
     ],
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 2",
         "Topic :: Home Automation",
         "Topic :: Education",

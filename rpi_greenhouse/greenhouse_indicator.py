@@ -6,6 +6,7 @@ from time import sleep
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
+
 class GreenhouseIndicator(object):
     LED_COLOURS = [
         'white',

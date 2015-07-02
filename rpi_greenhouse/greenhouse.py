@@ -94,9 +94,9 @@ class Greenhouse(object):
         start_time = time()
         end_time = time()
         while (
-                GPIO.input(pin) == GPIO.LOW and
-                time() - start_time < self.darkness_level
-            ):
+            GPIO.input(pin) == GPIO.LOW and
+            time() - start_time < self.darkness_level
+        ):
             end_time = time()
         time_taken = end_time - start_time
         return min(time_taken, self.darkness_level)
@@ -138,6 +138,7 @@ class Greenhouse(object):
         Defaults to /home/pi/greenhouse.csv
         """
         self.db.export_to_csv(file_path)
+
 
 def main():
     greenhouse = Greenhouse()
