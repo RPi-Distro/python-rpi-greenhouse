@@ -1,0 +1,14 @@
+#!/usr/bin/python
+
+from rpi_greenhouse import Greenhouse
+
+
+def main():
+    greenhouse = Greenhouse()
+
+    greenhouse.record_sensor_values()
+    greenhouse.export_to_csv()
+
+
+if __name__ == '__main__':
+    main()

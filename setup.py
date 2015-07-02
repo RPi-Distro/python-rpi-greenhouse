@@ -27,6 +27,11 @@ setup(
     ],
     url="https://github.com/bennuttall/rpi-greenhouse",
     packages=find_packages(),
+    scripts=[
+        'scripts/greenhouse-logger',
+        'scripts/greenhouse-indicator',
+        'scripts/greenhouse-clear-db',
+    ],
     install_requires=[
         "RPi.GPIO",
     ],
