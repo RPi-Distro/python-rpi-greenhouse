@@ -1,0 +1,15 @@
+site_name: Raspberry Pi Plantpot Greenhouse
+theme: united
+site_url: https://pythonhosted.org/rpi_greehouse/
+repo_url: https://github.com/bennuttall/rpi-greenhouse/
+site_description: Simple interface to Raspberry Pi Robot Greenhouse add-on board
+site_author: Ben Nuttall
+site_favicon: img/favicon.ico
+site_dir: pythonhosted
+pages:
+- [index.md, Home]
+- [installing.md, Installing]
+- [rtc.md, RTC setup]
+- [reference/index.md, API Reference, API Reference]
+- [reference/greenhouse.md, API Reference, Greenhouse]
+- [reference/greenhouseindicator.md, API Reference, Greenhouse Indicator]

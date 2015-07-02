@@ -1,8 +1,8 @@
-=============================
-Raspberry Pi Robot Greenhouse
-=============================
+================================
+Raspberry Pi Plantpot Greenhouse
+================================
 
-Python module for `Raspberry Pi`_ robot garden add-on board produced by `Rachel Rayns`_. The library provides a simple interface to logging data from the board's sensors, controlling the board's LEDs and using them to display information from the sensors.
+Python module for `Raspberry Pi`_ plantpot greenhouse add-on board produced by `Rachel Rayns`_. The library provides a simple interface to logging data from the board's sensors, controlling the board's LEDs and using them to display information from the sensors.
 
 Components
 ==========
@@ -27,6 +27,20 @@ RTC
 
 * Real Time Clock (DS1307)
 
+Installation
+============
+
+Install the dependencies and install *rpi-greenhouse* with *pip*.
+
+See full `installation instructions`_.
+
+Python 3 is not currently supported due to a Python 2 -only dependency. This will be resolved as a priority to add Python 3 support.
+
+Documentation
+=============
+
+Comprehensive documentation available at `pythonhosted.org/rpi-greenhouse`_
+
 Contributors
 ============
 
@@ -44,6 +58,8 @@ Open Source
 
 .. _Raspberry Pi: https://www.raspberrypi.org/
 .. _Rachel Rayns: https://github.com/RZRZR
+.. _installation instructions: https://pythonhosted.org/rpi-greenhouse/installing/
+.. _pythonhosted.org/rpi-greenhouse: https://pythonhosted.org/rpi-greenhouse/
 .. _Ben Nuttall: https://github.com/bennuttall
 .. _Tom Hartley: https://github.com/tomhartley
 .. _Luke Wren: https://github.com/wren6991
