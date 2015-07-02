@@ -1,6 +1,5 @@
 import os
 from setuptools import setup, find_packages
-from rpi_greenhouse import __version__
 
 
 description = """
@@ -13,7 +12,7 @@ def read(fname):
 
 setup(
     name="rpi-greenhouse",
-    version=__version__,
+    version="0.4.1",
     author="Ben Nuttall",
     author_email="ben@raspberrypi.org",
     description=description.strip(),
