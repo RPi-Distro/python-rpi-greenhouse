@@ -58,8 +58,8 @@ class Greenhouse(object):
 
     def _get_soil_moisture(self):
         time_taken = self._time_charging_soil_capacitor()
-        totally_wet_time = 8E-6
-        totally_dry_time = 0.01
+        totally_wet_time = 4E-3
+        totally_dry_time = 0.9
         moisture = (
             math.log(time_taken / totally_dry_time) /
             math.log(totally_wet_time / totally_dry_time)
@@ -68,15 +68,15 @@ class Greenhouse(object):
 
     def _time_charging_soil_capacitor(self):
         pin = self.SOIL
-        GPIO.setup(pin, GPIO.OUT)
+        GPIO.setup(pin, GPIO.OUT, GPIO.PUD_OFF)
         GPIO.output(pin, GPIO.LOW)
         sleep(0.1)
-        GPIO.setup(pin, GPIO.IN)
         start_time = time()
-        end_time = time()
+        GPIO.setup(pin, GPIO.IN)
         max_time = 1
         while GPIO.input(pin) == GPIO.LOW and time() - start_time < max_time:
-            end_time = time()
+            pass
+        end_time = time()
         time_taken = end_time - start_time
         return time_taken
 
