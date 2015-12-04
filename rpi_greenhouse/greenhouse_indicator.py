@@ -75,7 +75,7 @@ class GreenhouseIndicator(object):
             return self.SENSOR_OK
         elif self.temperature < lower:
             return self.SENSOR_LOW
-        elif self.temperature > higher:
+        elif self.temperature > upper:
             return self.SENSOR_HIGH
 
     @property
